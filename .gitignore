@@ -75,3 +75,5 @@ tests/
 **/*.float
 **/scope/*
 **/logss/*
+dreamerv3/*
+MySheepRL/*
