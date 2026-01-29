@@ -69,3 +69,9 @@ tests/
 
 # Docker history
 .isaac-lab-docker-history
+
+# model files
+**/*.npz
+**/*.float
+**/scope/*
+**/logss/*

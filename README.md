@@ -1,3 +1,26 @@
+# My Stuff:
+- Installed DreamerV3 (https://github.com/danijar/dreamerv3) directly into Docker Container
+- Added some custom scripts to properly use it with IsaacLab (gym wrapper in correct format; train+test script; etc) in [scripts/reinforcement_learning/danijar_dreamerv3](scripts/reinforcement_learning/danijar_dreamerv3)
+- Same custom scripts for SheepRL library (turned out to be too slow, so unfinished)
+
+
+Training:
+```bash
+isaaclab -p scripts/reinforcement_learning/danijar_dreamerv3/train.py --task Isaac-Velocity-Flat-Anymal-D-v0 --steps 1000000 --train_ratio 16.0 --num_envs 128 --from_checkpoint logss/20260112T122434_M/ckpt/20260112T154015F005102 --model_size size25m
+```
+
+Evaluation of trained model:
+```bash
+isaaclab -p scripts/reinforcement_learning/danijar_dreamerv3/play.py --checkpoint /root/logdir/dreamerv3/20260112T122434_M --episodes 3
+```
+
+
+------------------------------------------------------
+------------------------------------------------------
+------------------------------------------------------
+------------------------------------------------------
+
+
 ![Isaac Lab](docs/source/_static/isaaclab.jpg)
 
 ---

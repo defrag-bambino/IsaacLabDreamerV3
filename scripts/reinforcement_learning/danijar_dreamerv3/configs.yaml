@@ -1,0 +1,155 @@
+# Isaac Lab specific configurations for DreamerV3
+# These extend/override the base configs from dreamerv3/dreamerv3/configs.yaml
+
+# Default Isaac Lab settings
+isaac_defaults:
+  task: isaac_Isaac-Velocity-Rough-Unitree-Go2-v0
+  
+  run:
+    envs: 16
+    eval_envs: 0
+    train_ratio: 32.0
+    steps: 1e7
+    log_every: 60
+    report_every: 300
+    save_every: 600
+    
+  env:
+    isaac:
+      num_envs: 16
+      device: cuda:0
+
+# Small model for quick experiments
+isaac_debug:
+  <<: &isaac_base
+    task: isaac_Isaac-Velocity-Rough-Unitree-Go2-v0
+    run:
+      envs: 4
+      train_ratio: 8
+      steps: 1e5
+      log_every: 10
+      report_every: 30
+      save_every: 60
+      debug: true
+    env:
+      isaac:
+        num_envs: 4
+        device: cuda:0
+  batch_size: 8
+  batch_length: 10
+  jax:
+    platform: cuda
+    debug: true
+  agent:
+    .*\.layers: 1
+    .*\.units: 64
+    .*\.stoch: 8
+    .*\.classes: 8
+    .*\.deter: 64
+    .*\.hidden: 32
+    .*\.depth: 8
+
+# Unitree Go2 locomotion
+isaac_go2_velocity:
+  task: isaac_Isaac-Velocity-Rough-Unitree-Go2-v0
+  run:
+    envs: 16
+    train_ratio: 32
+    steps: 2e7
+  env:
+    isaac:
+      num_envs: 16
+
+# Unitree Go2 flat terrain
+isaac_go2_flat:
+  task: isaac_Isaac-Velocity-Flat-Unitree-Go2-v0
+  run:
+    envs: 16
+    train_ratio: 32
+    steps: 1e7
+  env:
+    isaac:
+      num_envs: 16
+
+# ANYmal locomotion  
+isaac_anymal:
+  task: isaac_Isaac-Velocity-Rough-Anymal-D-v0
+  run:
+    envs: 16
+    train_ratio: 32
+    steps: 2e7
+  env:
+    isaac:
+      num_envs: 16
+
+# Cartpole
+isaac_cartpole:
+  task: isaac_Isaac-Cartpole-v0
+  run:
+    envs: 32
+    train_ratio: 64
+    steps: 5e5
+  env:
+    isaac:
+      num_envs: 32
+
+# Ant locomotion
+isaac_ant:
+  task: isaac_Isaac-Ant-v0
+  run:
+    envs: 16
+    train_ratio: 32
+    steps: 1e7
+  env:
+    isaac:
+      num_envs: 16
+
+# Humanoid
+isaac_humanoid:
+  task: isaac_Isaac-Humanoid-v0
+  run:
+    envs: 16
+    train_ratio: 32
+    steps: 5e7
+  env:
+    isaac:
+      num_envs: 16
+
+# Franka manipulation
+isaac_franka_reach:
+  task: isaac_Isaac-Reach-Franka-v0
+  run:
+    envs: 16
+    train_ratio: 64
+    steps: 5e6
+  env:
+    isaac:
+      num_envs: 16
+
+isaac_franka_lift:
+  task: isaac_Isaac-Lift-Cube-Franka-v0
+  run:
+    envs: 16
+    train_ratio: 64
+    steps: 1e7
+  env:
+    isaac:
+      num_envs: 16
+
+# Shadow hand manipulation
+isaac_shadow_hand:
+  task: isaac_Isaac-Shadow-Hand-Over-v0
+  run:
+    envs: 8
+    train_ratio: 128
+    steps: 5e7
+  env:
+    isaac:
+      num_envs: 8
+
+# Model size recommendations for Isaac tasks
+# - Locomotion (Go2, ANYmal, Ant): size12m or size25m
+# - Simple control (Cartpole): size1m
+# - Manipulation (Franka): size25m or size50m
+# - Complex manipulation (Shadow Hand): size50m or size100m
+

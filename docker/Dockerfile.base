@@ -94,6 +94,11 @@ RUN --mount=type=cache,target=${DOCKER_USER_HOME}/.cache/pip \
 # HACK: Remove install of quadprog dependency
 RUN ${ISAACLAB_PATH}/isaaclab.sh -p -m pip uninstall -y quadprog
 
+# DreamerV3
+RUN ${ISAACLAB_PATH}/isaaclab.sh -p -m pip install git+https://github.com/defrag-bambino/dreamerv3-fork.git
+# for tensorboard
+RUN ${ISAACLAB_PATH}/isaaclab.sh -p -m pip install tensorflow -I 
+
 # aliasing isaaclab.sh and python for convenience
 RUN echo "export ISAACLAB_PATH=${ISAACLAB_PATH}" >> ${HOME}/.bashrc && \
     echo "alias isaaclab=${ISAACLAB_PATH}/isaaclab.sh" >> ${HOME}/.bashrc && \

@@ -1,0 +1,323 @@
+# @package _global_
+#python sheeprl.py fabric.accelerator=cpu fabric.devices=1 fabric.precision=16-mixed
+#   exp=dreamer_v3 algo=dreamer_v3_S env=gym env.id=CartPole-v1 algo.total_steps=20000
+#   algo.cnn_keys.encoder=\[\] algo.mlp_keys.encoder=\["vector"\] algo.cnn_keys.decoder=\[\]
+#   algo.mlp_keys.decoder=\["vector"\] env.num_envs=12 num_threads=16 checkpoint.every=5000
+#   metric.log_every=512 algo.replay_ratio=0.15
+
+
+
+num_threads: 16
+float32_matmul_precision: high
+dry_run: false
+seed: 42
+torch_use_deterministic_algorithms: false
+torch_backends_cudnn_benchmark: true
+torch_backends_cudnn_deterministic: false
+cublas_workspace_config: null
+exp_name: dreamer_v3_CartPole-v1
+run_name: 2025-11-26_12-03-43_dreamer_v3_CartPole-v1_42
+root_dir: dreamer_v3/CartPole-v1
+algo:
+  name: dreamer_v3
+  total_steps: 20000
+  per_rank_batch_size: 16
+  run_test: true
+  cnn_keys:
+    encoder: []
+    decoder: []
+  mlp_keys:
+    encoder:
+    - vector
+    decoder:
+    - vector
+  world_model:
+    optimizer:
+      _target_: torch.optim.Adam
+      lr: 0.0001
+      eps: 1.0e-08
+      weight_decay: 0
+      betas:
+      - 0.9
+      - 0.999
+    discrete_size: 32
+    stochastic_size: 32
+    kl_dynamic: 0.5
+    kl_representation: 0.1
+    kl_free_nats: 1.0
+    kl_regularizer: 1.0
+    continue_scale_factor: 1.0
+    clip_gradients: 1000.0
+    decoupled_rssm: false
+    learnable_initial_recurrent_state: true
+    encoder:
+      cnn_channels_multiplier: 32
+      cnn_act: torch.nn.SiLU
+      dense_act: torch.nn.SiLU
+      mlp_layers: 2
+      cnn_layer_norm:
+        cls: sheeprl.models.models.LayerNormChannelLast
+        kw:
+          eps: 0.001
+      mlp_layer_norm:
+        cls: sheeprl.models.models.LayerNorm
+        kw:
+          eps: 0.001
+      dense_units: 512
+    recurrent_model:
+      recurrent_state_size: 512
+      layer_norm:
+        cls: sheeprl.models.models.LayerNorm
+        kw:
+          eps: 0.001
+      dense_units: 512
+    transition_model:
+      hidden_size: 512
+      dense_act: torch.nn.SiLU
+      layer_norm:
+        cls: sheeprl.models.models.LayerNorm
+        kw:
+          eps: 0.001
+    representation_model:
+      hidden_size: 512
+      dense_act: torch.nn.SiLU
+      layer_norm:
+        cls: sheeprl.models.models.LayerNorm
+        kw:
+          eps: 0.001
+    observation_model:
+      cnn_channels_multiplier: 32
+      cnn_act: torch.nn.SiLU
+      dense_act: torch.nn.SiLU
+      mlp_layers: 2
+      cnn_layer_norm:
+        cls: sheeprl.models.models.LayerNormChannelLast
+        kw:
+          eps: 0.001
+      mlp_layer_norm:
+        cls: sheeprl.models.models.LayerNorm
+        kw:
+          eps: 0.001
+      dense_units: 512
+    reward_model:
+      dense_act: torch.nn.SiLU
+      mlp_layers: 2
+      layer_norm:
+        cls: sheeprl.models.models.LayerNorm
+        kw:
+          eps: 0.001
+      dense_units: 512
+      bins: 255
+    discount_model:
+      learnable: true
+      dense_act: torch.nn.SiLU
+      mlp_layers: 2
+      layer_norm:
+        cls: sheeprl.models.models.LayerNorm
+        kw:
+          eps: 0.001
+      dense_units: 512
+  actor:
+    optimizer:
+      _target_: torch.optim.Adam
+      lr: 8.0e-05
+      eps: 1.0e-05
+      weight_decay: 0
+      betas:
+      - 0.9
+      - 0.999
+    cls: sheeprl.algos.dreamer_v3.agent.Actor
+    ent_coef: 0.0003
+    min_std: 0.1
+    max_std: 1.0
+    init_std: 2.0
+    dense_act: torch.nn.SiLU
+    mlp_layers: 2
+    layer_norm:
+      cls: sheeprl.models.models.LayerNorm
+      kw:
+        eps: 0.001
+    dense_units: 512
+    clip_gradients: 100.0
+    unimix: 0.01
+    action_clip: 1.0
+    moments:
+      decay: 0.99
+      max: 1.0
+      percentile:
+        low: 0.05
+        high: 0.95
+  critic:
+    optimizer:
+      _target_: torch.optim.Adam
+      lr: 8.0e-05
+      eps: 1.0e-05
+      weight_decay: 0
+      betas:
+      - 0.9
+      - 0.999
+    dense_act: torch.nn.SiLU
+    mlp_layers: 2
+    layer_norm:
+      cls: sheeprl.models.models.LayerNorm
+      kw:
+        eps: 0.001
+    dense_units: 512
+    per_rank_target_network_update_freq: 1
+    tau: 0.02
+    bins: 255
+    clip_gradients: 100.0
+  gamma: 0.996996996996997
+  lmbda: 0.95
+  horizon: 15
+  replay_ratio: 0.15
+  learning_starts: 1024
+  per_rank_pretrain_steps: 0
+  per_rank_sequence_length: 64
+  cnn_layer_norm:
+    cls: sheeprl.models.models.LayerNormChannelLast
+    kw:
+      eps: 0.001
+  mlp_layer_norm:
+    cls: sheeprl.models.models.LayerNorm
+    kw:
+      eps: 0.001
+  dense_units: 512
+  mlp_layers: 2
+  dense_act: torch.nn.SiLU
+  cnn_act: torch.nn.SiLU
+  unimix: 0.01
+  hafner_initialization: true
+  player:
+    discrete_size: 32
+buffer:
+  size: 1000000
+  memmap: true
+  validate_args: false
+  from_numpy: false
+  checkpoint: true
+checkpoint:
+  every: 5000
+  resume_from: null
+  save_last: true
+  keep_last: 5
+distribution:
+  validate_args: false
+  type: auto
+env:
+  id: CartPole-v1
+  num_envs: 12
+  frame_stack: -1
+  sync_env: false
+  screen_size: 64
+  action_repeat: 1
+  grayscale: false
+  clip_rewards: false
+  capture_video: true
+  frame_stack_dilation: 1
+  actions_as_observation:
+    num_stack: -1
+    noop: You MUST define the NOOP
+    dilation: 1
+  max_episode_steps: null
+  reward_as_observation: false
+  wrapper:
+    _target_: gymnasium.make
+    id: CartPole-v1
+    render_mode: rgb_array
+  mask_velocities: false
+fabric:
+  _target_: lightning.fabric.Fabric
+  devices: 1
+  num_nodes: 1
+  strategy: auto
+  accelerator: cpu
+  precision: 16-mixed
+  callbacks:
+  - _target_: sheeprl.utils.callback.CheckpointCallback
+    keep_last: 5
+metric:
+  log_every: 512
+  disable_timer: false
+  log_level: 1
+  sync_on_compute: false
+  aggregator:
+    _target_: sheeprl.utils.metric.MetricAggregator
+    raise_on_missing: false
+    metrics:
+      Rewards/rew_avg:
+        _target_: torchmetrics.MeanMetric
+        sync_on_compute: false
+      Game/ep_len_avg:
+        _target_: torchmetrics.MeanMetric
+        sync_on_compute: false
+      Loss/world_model_loss:
+        _target_: torchmetrics.MeanMetric
+        sync_on_compute: false
+      Loss/value_loss:
+        _target_: torchmetrics.MeanMetric
+        sync_on_compute: false
+      Loss/policy_loss:
+        _target_: torchmetrics.MeanMetric
+        sync_on_compute: false
+      Loss/observation_loss:
+        _target_: torchmetrics.MeanMetric
+        sync_on_compute: false
+      Loss/reward_loss:
+        _target_: torchmetrics.MeanMetric
+        sync_on_compute: false
+      Loss/state_loss:
+        _target_: torchmetrics.MeanMetric
+        sync_on_compute: false
+      Loss/continue_loss:
+        _target_: torchmetrics.MeanMetric
+        sync_on_compute: false
+      State/kl:
+        _target_: torchmetrics.MeanMetric
+        sync_on_compute: false
+      State/post_entropy:
+        _target_: torchmetrics.MeanMetric
+        sync_on_compute: false
+      State/prior_entropy:
+        _target_: torchmetrics.MeanMetric
+        sync_on_compute: false
+      Grads/world_model:
+        _target_: torchmetrics.MeanMetric
+        sync_on_compute: false
+      Grads/actor:
+        _target_: torchmetrics.MeanMetric
+        sync_on_compute: false
+      Grads/critic:
+        _target_: torchmetrics.MeanMetric
+        sync_on_compute: false
+  logger:
+    _target_: lightning.fabric.loggers.TensorBoardLogger
+    name: 2025-11-26_12-03-43_dreamer_v3_CartPole-v1_42
+    root_dir: logs/runs/dreamer_v3/CartPole-v1
+    version: null
+    default_hp_metric: true
+    prefix: ''
+    sub_dir: null
+model_manager:
+  disabled: true
+  models:
+    world_model:
+      model_name: dreamer_v3_CartPole-v1_world_model
+      description: DreamerV3 World Model used in CartPole-v1 Environment
+      tags: {}
+    actor:
+      model_name: dreamer_v3_CartPole-v1_actor
+      description: DreamerV3 Actor used in CartPole-v1 Environment
+      tags: {}
+    critic:
+      model_name: dreamer_v3_CartPole-v1_critic
+      description: DreamerV3 Critic used in CartPole-v1 Environment
+      tags: {}
+    target_critic:
+      model_name: dreamer_v3_CartPole-v1_target_critic
+      description: DreamerV3 Target Critic used in CartPole-v1 Environment
+      tags: {}
+    moments:
+      model_name: dreamer_v3_CartPole-v1_moments
+      description: DreamerV3 Moments used in CartPole-v1 Environment
+      tags: {}
